@@ -1,0 +1,31 @@
+<style type="text/css">
+	body{
+	  text-align: center;  
+	  background: url("assets/home.png") no-repeat center center fixed;
+	  background-size: cover;  
+	  font-weight: bold;
+	}	
+</style>	
+	  
+	<div style="text-align: center; margin-top: 7%; padding-left: 40%">
+	<input type="search" placeholder="Search for event by hastag" class="form-control" style="width: 35%;"></input>
+	</div>
+
+                
+    <p style="font-size: 26px; padding-top: 15%;">#YourWeddingNowSocial</p>
+    <% if !current_user.nil? && current_user.is_owner? %>
+    	<%= link_to "My event", user_omniauth_authorize_path(:facebook), {:class => "btn btn-default btn-lg"} %>
+    <% else %>
+    	<%= link_to "Get Started", new_event_path, {:class => "btn btn-default btn-lg", :style => "margin-top: 18px" }%>
+    <% end %>
+
+
+
+    <p class="lead section-lead" style="font-weight: bold">Setup the perfect social wedding </p>
+    <p class="section-paragraph">View posts from Instagram, Twitter and Facebook tagged with your own hashtag all in one place</p>
+             
+<script>
+	$(document).ready(function(){
+
+	});
+</script>

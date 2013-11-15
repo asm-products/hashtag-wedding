@@ -1,0 +1,63 @@
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+			<img src="http://lorempixel.com/g/900/900/" />
+		</div>
+		<div class="col-md-9" style="background: white; min-height: 900px">
+			<% if current_user.nil? %>
+				<div style="text-align: center;font-size: 26px; padding-bottom: 15px">
+					<span>To get started</span>
+				</div>
+				<div style="clear:both; text-align:center">
+					<%= link_to "Sign in with Facebook", omniauth_authorize_path(:user, "facebook"), :class => "btn btn-primary btn-lg" %>
+				</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<%= link_to "Import", import_path, :remote => true, :id => "import_link" %>
+
+<div id="photo-holder">
+	<ul id="photo-holder-ul"></ul>
+</div>
+
+<div id="instagram-photo-holder">
+	<ul id="instagram-photo-holder-ul"></ul>
+</div>
+
+<div id="tweet-holder">
+	<ul id="tweet-holder-ul"></ul>
+</div>
+
+<div><%= @event.tag %></div>
+
+
+<button type="button" onclick="EventHelper.uploadImages(<%= @event.id %>)">Add</button>
+
+
+<button type="button" onclick="EventHelper.getTag('<%= @event.tag %>', 'instagram', false)">Tag</button>
+
+<button type="button" onclick="EventHelper.getTag('<%= @event.tag %>', 'twitter', false)">Tweet</button>
+
+<input type="text" id="tag-input" />
+<button type="button" onclick="EventHelper.addTag(<%= @event.id %>)">Add Tag</button>
+
+<script>
+	$(document).ready(function(){
+		$("#import_link").bind("ajax:complete", function(et, e){		    
+		    var ulist = $('#photo-holder-ul');
+ 
+		    $.each($.parseJSON(e.responseText), function(i, item){
+		    	var img = document.createElement('img');
+				img.src = item.src_big;
+				$(img).data('item', item);
+				img.onclick = EventHelper.modifySelectedImage;
+						    	
+			    ulist.append($(document.createElement('li').appendChild(img)));		    	
+		    });
+		  });
+
+	});
+</script>

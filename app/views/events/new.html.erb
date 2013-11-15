@@ -1,0 +1,70 @@
+<div class="container-fluid" style="overflow: hidden">
+	<div class="row">
+		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm">
+			<%  _img = Photo.get_images[rand(0..10)] %>
+			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
+		</div>
+		<div id="right-pane" class="col-md-9" style="background: white;">
+			<a class="btn btn-default pull-right" type="button" title="Home" href="<%= root_path %>" style="margin-right: 15px; margin-top: 15px">
+				<span class="glyphicon glyphicon-home"></span>
+			</a>			
+			<% if current_user.nil? %>
+				<div style="clear:both; text-align:center; padding-top: 22%; padding-bottom: 15px">
+					<%= link_to "Sign in with Facebook", omniauth_authorize_path(:user, "facebook"), :class => "btn btn-primary btn-lg" %>
+				</div>
+				<div style="text-align: center;font-size: 16px; padding-top: 20px; padding-bottom: 15px">
+					<span>We never post to Facebook</span>
+				</div>				
+			<% else %>
+				<div class="col-md-offset-2">
+					<img style="text-align: center; margin-top: 25px;" class="img-circle" src="https://graph.facebook.com/<%= current_user.uid %>/picture?width=50&height=50" />	
+				</div>
+				
+				<div class="col-md-6 col-md-offset-2">
+					<%= form_for @event, url: { action: "create"} , html: { role: "form" } do |f| %>
+						<%= f.label "Choose your hashtag", :style => "margin-top: 15px;" %>
+						<%= f.text_field :tag, :class => "form-control", :style => "margin-top:15px;", :value => "#" %>
+						<div style="text-align: center">
+							<%= f.submit "Create", :id => "event-btn", :class => "btn btn-default btn-primary", :style => "margin-top:15px;", :disable_with => "Creating" %>
+						</div>
+					<% end %>
+				</div>				
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function resizeColumn() {
+		$('#left-pane-img').height($(window).height());
+		$('#right-pane').css({ 'min-height': $(window).height() + 'px' });				
+	};
+	
+	$(document).ready(function() {
+		resizeColumn();
+		$(window).resize(resizeColumn);
+		
+		$('#event_tag').focusout(function(){
+			var tagValue = $('#event_tag').val();	
+			if(tagValue.length > 1) {
+			   var iChars = "#!@$%^&*()+=-[]\\\';,./{}|\":<>?~_";
+			   for (var i = 0; i < tagValue.length; i++) {
+			   	if(tagValue.charAt(0) == '#') {
+			   		continue;	
+			   	}
+			   	
+			  	if (iChars.indexOf(tagValue.charAt(i)) != -1) {
+			  	  alert ("Your string has special characters. \nThese are not allowed.");
+			  	  return;
+			  	}			  				  	
+			  }
+			  
+			  $('#event-btn').removeAttr('disabled');				
+			} else {
+				$('#event-btn').attr('disabled', 'disabled');
+			}
+			
+			
+		});
+	});
+</script>
