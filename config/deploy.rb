@@ -1,6 +1,6 @@
 require "bundler/capistrano"
 require 'thinking_sphinx/deploy/capistrano'
-load 'deploy/assets'
+#load 'deploy/assets'
 
 set :application, "events"
 set :user, "azureuser"
@@ -45,7 +45,11 @@ namespace :deploy do
   end
   after "deploy:setup", "deploy:setup_config"
 
-
+  set :normalize_asset_timestamps, false
+  after 'deploy:update_code' do
+    run "cd #{release_path}; RAILS_ENV=production bundle exec rake assets:precompile"    
+  end
+  
   task :symlink_config, roles: :app do
     # Add database config here
   end
