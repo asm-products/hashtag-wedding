@@ -16,6 +16,7 @@ gem "instagram"
 gem "twitter"
 gem "thinking-sphinx"
 gem "google-analytics-rails"
+gem 'therubyracer'
 
 # Gems used only for assets and not required
 # in production environments by default.
