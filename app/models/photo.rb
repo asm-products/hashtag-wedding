@@ -16,7 +16,7 @@ class Photo < ActiveRecord::Base
             {:name => "5377230062_c1338264de_b.jpg", :attr =>"http://www.flickr.com/photos/thedimka"}
            ] 
   
-  def self.get_images    
-    @holders
+  def self.get_image    
+    @holders[rand(0..9)]
   end 
 end

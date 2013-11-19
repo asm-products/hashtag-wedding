@@ -1,31 +1,96 @@
 <style type="text/css">
 	body{
-	  text-align: center;  
-	  background: url("assets/home.png") no-repeat center center fixed;
-	  background-size: cover;  
-	  font-weight: bold;
+	  text-align: center;  	  
+	  
 	}	
 </style>	
-	  
-	<div style="text-align: center; margin-top: 7%; padding-left: 40%">
-	<input type="search" placeholder="Search for event by hastag" class="form-control" style="width: 35%;"></input>
-	</div>
-
-                
-    <p style="font-size: 26px; padding-top: 15%;">#YourWeddingNowSocial</p>
-    <% if !current_user.nil? && current_user.is_owner? %>
-    	<%= link_to "My event", user_omniauth_authorize_path(:facebook), {:class => "btn btn-default btn-lg"} %>
-    <% else %>
-    	<%= link_to "Get Started", new_event_path, {:class => "btn btn-default btn-lg", :style => "margin-top: 18px" }%>
-    <% end %>
-
-
-
-    <p class="lead section-lead" style="font-weight: bold">Setup the perfect social wedding </p>
-    <p class="section-paragraph">View posts from Instagram, Twitter and Facebook tagged with your own hashtag all in one place</p>
+	
+	<div class="container-fluid">
+		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm" style="padding-left: 0px;">
+			<%  _img = Photo.get_image %>
+			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
+		</div> 
+		<div id="right-pane" class="col-md-9" style="background: white;"> 
+			<div style="text-align: center; margin-top: 7%; padding-left: 40%" autocomplete="off">
+			<input id="tag-search" type="search" placeholder="Search by hastag" class="form-control" style="width: 200px;"></input>
+			<div id="loading" style="float: left; font-weight: normal; margin-top: 10px;"></div>
+			</div>
+		
+		                
+		    <p style="font-size: 26px; padding-top: 15%;">#YourWeddingNowSocial</p>
+		    <% if !current_user.nil? && current_user.is_owner? %>
+		    	<%= link_to "My event", user_omniauth_authorize_path(:facebook), {:class => "btn btn-default btn-lg"} %>
+		    <% else %>
+		    	<%= link_to "Get Started", new_event_path, {:class => "btn btn-success btn-lg", :style => "margin-top: 18px" }%>
+		    <% end %>
+		
+		
+		
+		    <p class="lead section-lead">Setup the perfect social wedding </p>
+		    <p class="section-paragraph">View posts from Instagram, Twitter and Facebook tagged with your own hashtag all in one place</p>
+		    
+		    <% if current_user.nil? %>
+		    	<p style="font-weight: normal; margin-top: 18px;">Existing user?</p>
+		    	<%= link_to "Login", new_event_path, {:class => "btn btn-success", :style => "margin-top: 7px" }%>		    	
+		    <% end %>
+		</div>
+    </div>
              
 <script>
+	function resizeColumn() {
+		$('#left-pane-img').height($(window).height());
+		$('#right-pane').css({ 'min-height': $(window).height() + 'px' });				
+	};
+	
 	$(document).ready(function(){
-
+		resizeColumn();
+		$(window).resize(resizeColumn);
+		
+	  window.query_cache = {};
+	  $ = $.noConflict();
+	  $('#tag-search').typeahead({
+	      source:function(query,process){
+	          // if in cache use cached value, if don't wanto use cache remove this if statement
+	          if(query_cache[query]){
+        	      var results = query_cache[query].map(function(event) {
+            	     return event.tag;
+		          });	          	
+	              process(results);
+	              return;
+	          }
+	          if( typeof searching != "undefined") {
+	              clearTimeout(searching);
+	              process([]);
+	          }
+	          searching = setTimeout(function() {	          	  
+	              return $.getJSON(
+	                  "<%= events_search_path %>",
+	                  { term:query },
+	                  function(data){
+	            	      var results = data.map(function(event) {
+		            	     return event.tag;
+        		          });
+						  
+						  if(data.length <= 0) {
+						  	$('#loading').text('No Results');	
+						  } else {
+						  	$('#loading').text('');	
+						  }						  
+	                      // save result to cache, remove next line if you don't want to use cache
+	                      query_cache[query] = data;
+	                      // only search if stop typing for 300ms aka fast typers
+	                      	                      
+	                      return process(results);
+	                  }
+	              );
+	          }, 800); // 300 ms
+	      },
+	      
+	      updater: function(item) {
+	      	window.location.href = '/events/tag/' + item;
+	      }
+	  }); 
+		
+		
 	});
 </script>

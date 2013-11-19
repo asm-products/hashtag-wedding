@@ -48,6 +48,7 @@ gem 'jquery-rails'
 group :development do
   gem 'debugger'
   gem 'quiet_assets'
+  gem 'capistrano'
 end
 
 group :test do

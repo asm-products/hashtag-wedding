@@ -1,6 +1,6 @@
 <div class="container-fluid" style="overflow: hidden">
 	<div class="row">
-		<div class="col-md-3 hidden-sm" id="left-pane" >
+		<div class="col-md-3 hidden-xs" id="left-pane" >
 			<div class="affix">
 				<% if !@event.photos.nil? && @event.photos.length > 0  
 					 index = rand(0..(@event.photos.length - 1))					 
@@ -8,34 +8,35 @@
 						
 					<img id="left-pane-img" src="<%= @event.photos[index].url %>" />
 				<% else	
-					  _img = Photo.get_images[rand(0..10)] 
+					  _img = Photo.get_image 
 				%>
 	   				<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />									
 				<% end %>
 			</div>
 		</div>
-		<div id="right-pane" class="col-md-8" style="background: white;">			
-           <div class="row"> 
+		<div id="right-pane" class="col-md-9" style="background: white;">			
+           <div class="row" style="margin-right: 20px;">            		
 				<div class="btn-group pull-right">
-					<button class="btn btn-default" type="button" title="Search">
+					<input id="tag-search" type="search" placeholder="Search by hastag" class="form-control" style="float: left; width: 150px; visibility: hidden; margin-right: 10px;"></input>
+					<button id="search-btn" class="btn btn-warning" type="button" title="Search">
 						<span class="glyphicon glyphicon-search"></span>
 					</button>
-					<a class="btn btn-default" type="button" title="Home" href="<%= root_path %>">
+					<a class="btn btn-info" type="button" title="Home" href="<%= root_path %>">
 						<span class="glyphicon glyphicon-home"></span>
 					</a>
 					<% if current_user.nil? %>
-						<a class="btn btn-default" title="Log in" href="<%= omniauth_authorize_path(:user, "facebook") %>">
+						<a class="btn btn-success" title="Log in" href="<%= omniauth_authorize_path(:user, "facebook") %>">
 							<span class="glyphicon glyphicon-log-in"></span>
 						</a>					
 					<% else %>						
-						<a id="log-out-btn" class="btn btn-default" type="button" title="Log out" data-remote="true" href="<%= destroy_user_session_path %>" data-method="delete">
+						<a id="log-out-btn" class="btn btn-danger" type="button" title="Log out" data-remote="true" href="<%= destroy_user_session_path %>" data-method="delete">
 							<span class="glyphicon glyphicon-log-out"></span>
 						</a>
 					<% end %>
 				</div>
             </div>		
-			<div class="row" style="margin-top: 20px">
-				<div class="col-md-10 col-md-offset-2">
+			<div class="row" style="margin-top: 30px">
+				<div class="col-md-10 col-md-offset-1">
 					<% if !@event.owner_u2.nil? %>
 						<img style="text-align: center" class="img-circle pull-left" src="https://graph.facebook.com/<%= @event.owner_u2.uid %>/picture?width=50&height=50" />
 					<% end %>
@@ -45,17 +46,19 @@
 				</div>
 			</div>		
 			<div class="row">
-				<div class="col-md-10 col-md-offset-3">
+				<div class="col-md-10">
 					<% @result.each do |item| %>
-						<div class="row" style="padding-bottom: 35px; margin-left: 30px;">
+						<div class="row" style="padding-bottom: 35px; margin-left: 30%;">
 							<% if item.type == 2 %>
-								<div class="col-md-9" >						
+								<div class="col-md-9" >		
+									<div style="text-align: center">				
 									<blockquote class="twitter-tweet"><p><%= item.media %></p>&mdash; <%= item.user %> <a href="https://twitter.com/<%=item.user%>/statuses/<%=item.oid%>">November 6, 2013</a></blockquote>
+									</div>
 								</div>
 							<% end %>
 							<% if item.type == 1 %>																
 								<div class="col-md-8" style="padding-left: 0px; padding-right: 0px; margin-left: 20px;">
-									<div class="instagram-block" style="max-width: 450px">
+									<div class="instagram-block" style="max-width: 465px">
 										<div class="row" style="margin-top: 5px; padding-left: 5px">
 											<div class="col-md-2">
 												<img src="<%= item.profile_img %>" class="img-circle" style="height: 50px; width: 50px"></img>											
@@ -91,7 +94,7 @@
 										-->
 									</div>									
 									<div class="row" style="margin-top:10px; margin-left: 0px; margin-right: 0px">
-										<div>
+										<div style="max-width: 465px">
 											<video controls="controls" poster="<%= item.thumb %>" width="100%" height="470">
 												<source src="<%= item.media %>" type="video/mp4" />
 											</video>
@@ -168,6 +171,48 @@
 				alert("Logged out");
 			});
 		<% end %>
+		
+		$('#search-btn').click(function(){
+			$('#tag-search').css("visibility", "visible");			
+		});
+		
+		window.query_cache = {};
+	    $('#tag-search').typeahead({
+	      source:function(query,process){
+	          // if in cache use cached value, if don't wanto use cache remove this if statement
+	          if(query_cache[query]){
+        	      var results = query_cache[query].map(function(event) {
+            	     return event.tag;
+		          });	          	
+	              process(results);
+	              return;
+	          }
+	          if( typeof searching != "undefined") {
+	              clearTimeout(searching);
+	              process([]);
+	          }
+	          searching = setTimeout(function() {
+	              return $.getJSON(
+	                  "<%= events_search_path %>",
+	                  { term:query },
+	                  function(data){
+	            	      var results = data.map(function(event) {
+		            	     return event.tag;
+        		          });
+
+	                      // save result to cache, remove next line if you don't want to use cache
+	                      query_cache[query] = data;
+	                      // only search if stop typing for 300ms aka fast typers
+	                      return process(results);
+	                  }
+	              );
+	          }, 300); // 300 ms
+	      },
+	      
+	      updater: function(item) {
+	      	window.location.href = '/events/tag/' + item;
+	      }
+	    });		
 	});
 	
 </script>

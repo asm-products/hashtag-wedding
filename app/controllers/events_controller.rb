@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_filter :authenticate_user!, :except => [:new, :show]
+  before_filter :authenticate_user!, :except => [:new, :show, :search, :get_tag]
   
   def search
    @events = Event.search(params[:term])
@@ -7,6 +7,15 @@ class EventsController < ApplicationController
    respond_to do |format|
      format.js { render :json => @events.to_json}
    end 
+  end
+  
+  def get_tag
+    @event = Event.search(params[:hashtag]).first
+    if !@event.nil?
+      redirect_to event_path(@event)
+    else 
+      render 'new'      
+    end
   end
    
   def create

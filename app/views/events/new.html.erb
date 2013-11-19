@@ -1,11 +1,11 @@
 <div class="container-fluid" style="overflow: hidden">
 	<div class="row">
 		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm">
-			<%  _img = Photo.get_images[rand(0..10)] %>
+			<%  _img = Photo.get_image %>
 			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
 		</div>
 		<div id="right-pane" class="col-md-9" style="background: white;">
-			<a class="btn btn-default pull-right" type="button" title="Home" href="<%= root_path %>" style="margin-right: 15px; margin-top: 15px">
+			<a class="btn btn-info pull-right" type="button" title="Home" href="<%= root_path %>" style="margin-right: 15px; margin-top: 15px">
 				<span class="glyphicon glyphicon-home"></span>
 			</a>			
 			<% if current_user.nil? %>

@@ -3,6 +3,7 @@ Events::Application.routes.draw do
   
   match '/import' => 'users#import'
   match '/events/search' => 'events#search'
+  match '/events/tag/:hashtag' => 'events#get_tag'
   match '/events/:tag/tag_details' => 'events#tag_details'
   
   root :to => "stats#home"
