@@ -23,7 +23,9 @@ test:
   password: jak2saw2
   
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
+  adapter: mysql2
+  database: events
   pool: 5
   timeout: 5000
+  username: cralert_user
+  password: 2shotsDextmedic

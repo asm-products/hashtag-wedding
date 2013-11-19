@@ -1,0 +1,4 @@
+production:
+  mem_limit: 128M
+  min_prefix_len: 5
+  mysql41: 34555
