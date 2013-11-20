@@ -10,7 +10,8 @@
 				<% else	
 					  _img = Photo.get_image 
 				%>
-	   				<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />									
+	   				<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
+	   				<span class="glyphicon glyphicon-info-sign" style="color: white; left: 10px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>									
 				<% end %>
 			</div>
 		</div>
@@ -47,6 +48,15 @@
 			</div>		
 			<div class="row">
 				<div class="col-md-10">
+					<% if @result.length <= 0 %>
+						<div class="row" style="padding-bottom: 35px; margin-left: 25%; margin-top: 75px">
+						<% if @in_max_id.nil? && @tw_max_id.nil? %>							
+								<span>No posts at this moment. Post to instagram or twitter with #<%= @event.tag %> and see them all here</span>							
+						<% else %>
+								<span>No more posts.</span>
+						<% end %>
+						</div>
+					<% end %>
 					<% @result.each do |item| %>
 						<div class="row" style="padding-bottom: 35px; margin-left: 30%;">
 							<% if item.type == 2 %>
@@ -57,7 +67,7 @@
 								</div>
 							<% end %>
 							<% if item.type == 1 %>																
-								<div class="col-md-8" style="padding-left: 0px; padding-right: 0px; margin-left: 20px;">
+								<div class="col-md-9" style="padding-left: 0px; padding-right: 0px; margin-left: 20px;">
 									<div class="instagram-block" style="max-width: 465px">
 										<div class="row" style="margin-top: 5px; padding-left: 5px">
 											<div class="col-md-2">
@@ -73,7 +83,7 @@
 										</div>									
 										<div class="row" style="margin-top:10px; margin-left: 0px; margin-right: 0px">
 											<div>
-												<img src="<%= item.media %>" style="width: 100%; height: 490px; max-width: 450px;"></img>
+												<img src="<%= item.media %>" style="width: 100%; height: 470px; max-width: 450px;"></img>
 											</div>
 										</div>
 									</div>																		

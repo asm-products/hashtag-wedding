@@ -9,15 +9,16 @@
 		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm" style="padding-left: 0px;">
 			<%  _img = Photo.get_image %>
 			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
+			<span class="glyphicon glyphicon-info-sign" style="color: white; left: 10px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>
 		</div> 
 		<div id="right-pane" class="col-md-9" style="background: white;"> 
 			<div style="text-align: center; margin-top: 7%; padding-left: 40%" autocomplete="off">
 			<input id="tag-search" type="search" placeholder="Search by hastag" class="form-control" style="width: 200px;"></input>
-			<div id="loading" style="float: left; font-weight: normal; margin-top: 10px;"></div>
+			<div id="loading" style="float: left; font-weight: normal; margin-top: 10px; color: red"></div>
 			</div>
 		
 		                
-		    <p style="font-size: 26px; padding-top: 15%;">#YourWeddingNowSocial</p>
+		    <p style="font-size: 26px; padding-top: 15%;">#YourWeddingMemoriesInOnePlace</p>
 		    <% if !current_user.nil? && current_user.is_owner? %>
 		    	<%= link_to "My event", user_omniauth_authorize_path(:facebook), {:class => "btn btn-default btn-lg"} %>
 		    <% else %>

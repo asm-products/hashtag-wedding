@@ -2,7 +2,8 @@ class EventsController < ApplicationController
   before_filter :authenticate_user!, :except => [:new, :show, :search, :get_tag]
   
   def search
-   @events = Event.search(params[:term])
+   search_term = params[:term].delete "#"
+   @events = Event.search(search_term)
    
    respond_to do |format|
      format.js { render :json => @events.to_json}
@@ -102,6 +103,7 @@ class EventsController < ApplicationController
       @in_max_id = in_result.pagination.next_max_tag_id
     end        
     
+    tw_result = Array.new
     if !params[:tw_max_id].nil?
       tw_result = get_tag_twitter @event.tag, :max_id => params[:tw_max_id].to_i, :result_type => "mixed"
     elsif !params[:tw_min_id].nil?
