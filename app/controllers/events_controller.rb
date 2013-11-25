@@ -1,5 +1,23 @@
 class EventsController < ApplicationController
-  before_filter :authenticate_user!, :except => [:new, :show, :search, :get_tag]
+  before_filter :authenticate_user!, :except => [:new, :show, :search, :get_tag, :availability]
+  
+  def availability
+    tag = params[:tag].delete "#"
+    @result = Hash.new  
+    in_arr = get_tag_instagram tag, {}
+    if !in_arr.nil? && in_arr.length > 3
+      @result[:instagram] = in_arr[0..2]
+    end
+    
+    tw_arr = get_tag_twitter tag, {}
+    if !tw_arr.nil? && tw_arr.length > 3
+      @result[:twitter] = tw_arr[0..2]
+    end
+    
+    respond_to do |format|
+      format.js { render :json => @result.to_json }
+    end    
+  end
   
   def search
    search_term = params[:term].delete "#"
@@ -37,7 +55,7 @@ class EventsController < ApplicationController
   end
   
   def new
-    @event = Event.new
+    @event ||= Event.new
     if !current_user.nil?
       event = Event.where("owner =? OR owner2 = ?", current_user.id, current_user.id)
       if !event.blank?
@@ -146,43 +164,7 @@ class EventsController < ApplicationController
       render :nothing => true
     end
   end
-  
-  def tag_details
-    @result = Array.new
-    fb_result = get_tag_info params[:tag], "fb"
-    
-    in_result = get_tag_info params[:tag], "instagram"
-    in_result.each do |r|
-      entry = Media.new
-      entry.user = r.user.username
-      entry.profile_img = r.user.profile_picture
-      entry.created_at = Time.at(r.caption.created_time.to_i)
-      if r.type == "image"
-        entry.media = r.images.standard_resolution
-      elsif r.type == "video"
-        entry.media = r.videos.standard_resolution
-      end
-      
-      entry.type = 1
-      @result << entry
-    end
-    
-    tw_result = get_tag_info params[:tag], "twitter"
-    tw_result.each do |r|
-      entry = Media.new
-      entry.user = r.user.name
-      entry.profile_img = r.user.profile_image_url
-      entry.created_at = r.created_at 
-      entry.media = r.text
-      entry.type = 2
-      @result << entry
-    end
-    
-    respond_to do |format|
-      format.js { render :json => @result.to_json }
-    end                    
-  end
-  
+   
   private
   def get_tag_info tag, provider
     result = ''

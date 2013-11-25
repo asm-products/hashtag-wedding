@@ -1,16 +1,15 @@
 Events::Application.routes.draw do
   devise_for :users, :controllers => { :omniauth_callbacks => "callbacks" }
   
-  match '/import' => 'users#import'
   match '/events/search' => 'events#search'
   match '/events/tag/:hashtag' => 'events#get_tag'
-  match '/events/:tag/tag_details' => 'events#tag_details'
+  match '/events/availability' => 'events#availability'  
   
   root :to => "stats#home"
   
   resources :events do
     member do
-      post 'tag'
+      post 'tag'      
     end
   end
   

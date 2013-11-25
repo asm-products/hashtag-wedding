@@ -3,7 +3,7 @@
 		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm">
 			<%  _img = Photo.get_image %>
 			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
-			<span class="glyphicon glyphicon-info-sign" style="color: white; left: 10px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>
+			<span class="glyphicon glyphicon-info-sign" style="color: white; left: 20px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>
 		</div>
 		<div id="right-pane" class="col-md-9" style="background: white;">
 			<a class="btn btn-info pull-right" type="button" title="Home" href="<%= root_path %>" style="margin-right: 15px; margin-top: 15px">
@@ -15,20 +15,65 @@
 				</div>
 				<div style="text-align: center;font-size: 16px; padding-top: 20px; padding-bottom: 15px">
 					<span>We never post to Facebook</span>
-				</div>				
-			<% else %>
-				<div class="col-md-offset-2">
-					<img style="text-align: center; margin-top: 25px;" class="img-circle" src="https://graph.facebook.com/<%= current_user.uid %>/picture?width=50&height=50" />	
 				</div>
-				
-				<div class="col-md-6 col-md-offset-2">
-					<%= form_for @event, url: { action: "create"} , html: { role: "form" } do |f| %>
-						<%= f.label "Choose your hashtag", :style => "margin-top: 15px;" %>
-						<%= f.text_field :tag, :class => "form-control", :style => "margin-top:15px;", :value => "#" %>
+				<% if !@event.errors.blank? %>
+					<div style="text-align: center;font-size: 16px; padding-top: 25px; padding-bottom: 15px; padding-left: 20px; padding-right: 20px;">
+						<% if @event.errors.messages[:owner].include? "user_denied" %>
+							<span>It looks like you have denied access to your facebook profile. Please reconsider providing access, we never post to your news feed or store any of your personal info on our site.</span>
+						<% end %>
+					</div>					
+				<% end %>				
+			<% else %>
+				<div class="row">
+					<div class="col-md-offset-2" >
+						<img style="text-align: center; margin-top: 25px;" class="img-circle" src="https://graph.facebook.com/<%= current_user.uid %>/picture?width=50&height=50" />	
+					</div>
+					
+					<div class="col-md-6 col-md-offset-2">
+						<%= form_for @event, url: { action: "create"} , html: { role: "form", class: "form-horizontal" } do |f| %>
+							<div class="row">
+								<div class="col-xs-6" style="margin-left: 70px">
+									<%= f.label "Choose your hashtag", :style => "margin-top: 15px;" %>
+								</div>
+							</div>						
+							<div class="row">
+								<div class="col-xs-10" style="margin-left: 70px">
+									<%= f.text_field :tag, :class => "form-control", :style => "margin-top:15px;", :value => "#" %>
+								</div>									
+							</div>																					
+							
+							<div class="row">
+								<div style="text-align: center">										
+									<%= f.submit "Create", :id => "event-btn", :class => "btn btn-default btn-primary", :style => "margin-top:15px;", :disable_with => "Creating"%>
+								</div>
+							</div>
+						<% end %>
+					</div>
+				</div>
+				<div class="row" style="margin-top: 200px;">
+					<div class="col-md-6 col-md-offset-2">
 						<div style="text-align: center">
-							<%= f.submit "Create", :id => "event-btn", :class => "btn btn-default btn-primary", :style => "margin-top:15px;", :disable_with => "Creating" %>
+							<a href="/events/availability" id="a-check">Check if hashtag is used by others</a>
 						</div>
-					<% end %>
+					</div>
+				</div>
+				<div class="row" style="margin-top: 15px;">
+					<div id="tweet-box" class="col-md-6" style="text-align: center">
+						<div class="row">
+							<span class="check-header" style="visibility: hidden; font-size: 1.2em">Twitter</span>
+						</div>
+						<div class="row" style="margin-top: 10px;">
+							<div id="tw-holder" class="list-group"></div>
+						</div>
+					</div>
+					<div id="insta-box" class="col-md-6" style="text-align: center">
+						<div class="row">
+							<span class="check-header" style="visibility: hidden; font-size: 1.2em">Instagram</span>
+						</div>
+						<div class="row" style="margin-top: 10px;">												
+							<div id="in-holder" class="list-group"></div>
+						</div>
+					</div>
 				</div>				
 			<% end %>
 		</div>
@@ -41,31 +86,86 @@
 		$('#right-pane').css({ 'min-height': $(window).height() + 'px' });				
 	};
 	
+	function checkTagAvailability() {
+		if(validateTag()) {
+			$('#tw-holder').empty();
+			$('#in-holder').empty();
+			
+			$.getJSON("<%= events_availability_path %>", { tag: $('#event_tag').val() }, function(data){				
+				var tweetBox = $('#tw-holder');
+				var instaBox = $('#in-holder');
+				if(data['instagram'] && data['instagram'].length > 0) {
+					$.each(data['instagram'], function(i, item){
+						var img = document.createElement('img');
+						img.src = item.images.standard_resolution.url;
+						img.style.height = "150px";
+						img.style.width = "150px";
+						instaBox.append(img);				
+					});
+				} else {
+					instaBox.text('No photos tagged with your hashtag');
+				}
+	
+				
+				if(data['twitter'] && data['twitter'].length > 0) {			
+					$.each(data['twitter'], function(i, item){
+						var spanEl = document.createElement('span');
+						spanEl.className = "list-group-item";
+						$(spanEl).text(item.text);
+						tweetBox.append(spanEl);				
+					});			
+				} else {
+					tweetBox.text('No tweets with your hashtag');
+				}
+				
+				$('.check-header').css('visibility', 'visible');
+			}).fail(function(){
+				alert("Failed to get data from instagram and twitter. Please try again later");
+			});
+		} else {
+			
+		}				
+	};
+	
+	function validateTag() {
+		var tagValue = $('#event_tag').val();	
+		if(tagValue.length > 1) {
+		   var iChars = "#!@$%^&*()+=-[]\\\';,./{}|\":<>?~_";
+		   for (var i = 0; i < tagValue.length; i++) {
+		   	if(tagValue.charAt(0) == '#') {
+		   		continue;	
+		   	}
+		   	
+		  	if (iChars.indexOf(tagValue.charAt(i)) != -1) {
+		  	  alert ("Your hashtag has special characters. \nThese are not allowed.");
+		  	  return false;
+		  	}			  				  	
+		  }
+		  
+		  return true;
+		} else {
+			alert("Enter a valid hashtag");
+		}
+		  return false;				
+	};
+	
 	$(document).ready(function() {
 		resizeColumn();
 		$(window).resize(resizeColumn);
 		
 		$('#event_tag').focusout(function(){
-			var tagValue = $('#event_tag').val();	
-			if(tagValue.length > 1) {
-			   var iChars = "#!@$%^&*()+=-[]\\\';,./{}|\":<>?~_";
-			   for (var i = 0; i < tagValue.length; i++) {
-			   	if(tagValue.charAt(0) == '#') {
-			   		continue;	
-			   	}
-			   	
-			  	if (iChars.indexOf(tagValue.charAt(i)) != -1) {
-			  	  alert ("Your string has special characters. \nThese are not allowed.");
-			  	  return;
-			  	}			  				  	
-			  }
-			  
+			if(validateTag()) {			  
 			  $('#event-btn').removeAttr('disabled');				
 			} else {
-				$('#event-btn').attr('disabled', 'disabled');
+			  $('#event-btn').attr('disabled', 'disabled');
 			}
 			
 			
 		});
+		
+		$('#a-check').click(function() {
+			checkTagAvailability();
+			return false;
+		});		
 	});
 </script>
