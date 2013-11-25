@@ -66,6 +66,7 @@ class User < ActiveRecord::Base
   def import_photos_fb event
     @graph = Koala::Facebook::GraphAPI.new(self.token)
     return if event.owner_u1.nil? || event.owner_u2.nil?
+    
     photos = @graph.fql_query("select object_id, caption,src_small,src_big from photo where pid in (select pid from photo_tag where subject='#{event.owner_u2.uid}') and pid in (select pid from photo_tag where subject='#{event.owner_u1.uid}')")
     photos.each do |photo|
       if Photo.find_by_pid(photo['object_id']).blank?
