@@ -1,11 +1,7 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
-  full_url = "//hashtagwedding.me/"
-  if ENV['RAILS_ENV'] != "production"
-    full_url = "//enkdev.dyndns.org"  
-  end
-  config.omniauth :facebook, ENV['FB_ID'], ENV['FB_SECRET'], :scope => 'email, user_photos, user_relationships, friends_photos', :display => 'popup', :full_host => full_url
+  config.omniauth :facebook, ENV['FB_ID'], ENV['FB_SECRET'], :scope => 'email, user_photos, user_relationships, friends_photos'
 
   #"589757064420081"
   #"b948ef594f10093a0bd326800c992020"

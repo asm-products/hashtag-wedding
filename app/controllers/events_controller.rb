@@ -80,7 +80,7 @@ class EventsController < ApplicationController
     @result = Array.new
     if user_signed_in?
       current_user.import_photos_fb @event
-      fb_result = get_tag_info @event.tag, "fb"
+      #fb_result = get_tag_info @event.tag, "fb"
     end
     
     @photos = @event.photos
