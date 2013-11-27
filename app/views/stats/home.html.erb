@@ -82,8 +82,10 @@
 	                      	                      
 	                      return process(results);
 	                  }
-	              );
-	          }, 800); // 300 ms
+	              ).fail(function(){
+	              	$('#loading').text('Oops, search Unavailable');
+	              });
+	          }, 500); // 300 ms
 	      },
 	      
 	      updater: function(item) {

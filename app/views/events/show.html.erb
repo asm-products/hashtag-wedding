@@ -18,6 +18,7 @@
 		<div id="right-pane" class="col-md-9" style="background: white;">			
            <div class="row" style="margin-right: 20px;">            		
 				<div class="btn-group pull-right">
+					<div id="loading" style="float: left; font-weight: normal; margin-right: 10px; color: red; margin-top: 10px"></div>
 					<input id="tag-search" type="search" placeholder="Search by hastag" class="form-control" style="float: left; width: 150px; visibility: hidden; margin-right: 10px;"></input>
 					<button id="search-btn" class="btn btn-warning" type="button" title="Search">
 						<span class="glyphicon glyphicon-search"></span>
@@ -83,7 +84,7 @@
 										</div>									
 										<div class="row" style="margin-top:10px; margin-left: 0px; margin-right: 0px">
 											<div>
-												<img src="<%= item.media %>" style="width: 100%; height: 470px; max-width: 450px;"></img>
+												<img src="<%= item.media %>" style="width: 100%; height: 470px; max-width: 470px;"></img>
 											</div>
 										</div>
 									</div>																		
@@ -105,7 +106,7 @@
 									</div>									
 									<div class="row" style="margin-top:10px; margin-left: 0px; margin-right: 0px">
 										<div style="max-width: 465px">
-											<video controls="controls" poster="<%= item.thumb %>" width="100%" height="470">
+											<video controls="controls" poster="<%= item.thumb %>" width="470" height="470">
 												<source src="<%= item.media %>" type="video/mp4" />
 											</video>
 										</div>
@@ -210,13 +211,21 @@
 		            	     return event.tag;
         		          });
 
+						  if(data.length <= 0) {
+						  	$('#loading').text('No Results');	
+						  } else {
+						  	$('#loading').text('');	
+						  }
+						  
 	                      // save result to cache, remove next line if you don't want to use cache
 	                      query_cache[query] = data;
 	                      // only search if stop typing for 300ms aka fast typers
 	                      return process(results);
 	                  }
-	              );
-	          }, 300); // 300 ms
+	              ).fail(function(){
+	              	$('#loading').text('Oops, search Unavailable');
+	              });
+	          }, 500); // 300 ms
 	      },
 	      
 	      updater: function(item) {
