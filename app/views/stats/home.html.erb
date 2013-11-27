@@ -22,17 +22,16 @@
 		    <% if !current_user.nil? && current_user.is_owner? %>
 		    	<%= link_to "My event", user_omniauth_authorize_path(:facebook), {:class => "btn btn-default btn-lg"} %>
 		    <% else %>
-		    	<%= link_to "Get Started", new_event_path, {:class => "btn btn-success btn-lg", :style => "margin-top: 18px" }%>
+		    	<%= link_to "Get Started", new_event_path, {:class => "btn btn-success btn-lg", :style => "margin-top: 18px", :alt => "Create your wedding hashtag now" }%>
 		    <% end %>
 		
-		
-		
+				
 		    <p class="lead section-lead">Setup the perfect social wedding </p>
 		    <p class="section-paragraph">View posts from Instagram, Twitter and Facebook tagged with your own hashtag all in one place</p>
 		    
 		    <% if current_user.nil? %>
 		    	<p style="font-weight: normal; margin-top: 18px;">Existing user?</p>
-		    	<%= link_to "Login", new_event_path, {:class => "btn btn-success", :style => "margin-top: 7px" }%>		    	
+		    	<%= link_to "Login", new_event_path, {:class => "btn btn-success", :style => "margin-top: 7px", :alt => "Login to see your wedding hashtag board" }%>		    	
 		    <% end %>
 		</div>
     </div>
