@@ -7,9 +7,11 @@
 	
 	<div class="container-fluid">
 		<div id="left-pane" class="col-md-3 hidden-xs hidden-sm" style="padding-left: 0px;">
-			<%  _img = Photo.get_image %>
-			<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
-			<span class="glyphicon glyphicon-info-sign" style="color: white; left: 10px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>
+			<div class="affix">
+				<%  _img = Photo.get_image %>
+				<img id="left-pane-img" src="<%= "/assets/" + _img[:name] %>" />
+				<span class="glyphicon glyphicon-info-sign" style="color: white; left: 10px; top: 10px; position: absolute;" title="<%= _img[:attr] %>"></span>
+			</div>
 		</div> 
 		<div id="right-pane" class="col-md-9" style="background: white;"> 
 			<div style="text-align: center; margin-top: 7%; padding-left: 40%" autocomplete="off">
@@ -33,6 +35,9 @@
 		    	<p style="font-weight: normal; margin-top: 18px;">Existing user?</p>
 		    	<%= link_to "Login", new_event_path, {:class => "btn btn-success", :style => "margin-top: 7px", :alt => "Login to see your wedding hashtag board" }%>		    	
 		    <% end %>
+		    <div style="clear:both; margin-top: 30px">
+		    	<span>send feedback to cralert@outlook.com</span>
+		    </div>
 		</div>
     </div>
              
